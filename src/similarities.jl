@@ -55,6 +55,22 @@ function cossim(x::AbstractVector, y::AbstractVector)
     dot(x,y) / (norm_x * norm_y)
 end
 
+function cossim(A::AbstractMatrix; by_row::Bool=true)
+    if by_row == true
+        norms = norm.(eachrow(A))
+    else
+        norms = norm.(eachcol(A))
+        A = transpose(A)
+    end
+    
+    if any(norms == 0)
+        "vectors must be nonzero" |> ErrorException |> throw
+    end
+   
+    S = (A * transpose(A))./(norms * transpose(norms))
+    return S
+end
+
 function cossim(f, g, interval::LSHFunctions.RealInterval)
     norm_f = L2_norm(f, interval)
     norm_g = L2_norm(g, interval)
